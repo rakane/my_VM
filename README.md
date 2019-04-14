@@ -1,5 +1,5 @@
 # LC-3 Virtual Machine written in C
-### This virtual machine was created following Justin Meiner's tutorial that can be found [here](https://justinmeiners.github.io/lc3-vm/)
+### This virtual machine was created following Justin Meiner and Ryan Pendleton's tutorial that can be found [here](https://justinmeiners.github.io/lc3-vm/)
 
 ## To Run:
 1. Download or clone repository
