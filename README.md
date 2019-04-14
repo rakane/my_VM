@@ -4,4 +4,4 @@
 ## To Run:
 1. Download or clone repository
 2. run "make compile" in your terminal
-3. run "./vm.out path/to/file" in terminal using 2048 or Rogue
+3. run "./vm.out path/to/file" in terminal using 2048 or Roguey
