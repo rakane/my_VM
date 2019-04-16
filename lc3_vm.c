@@ -42,7 +42,7 @@ enum
     OP_LDI,    /* load indirect */
     OP_STI,    /* store indirect */
     OP_JMP,    /* jump */
-    OP_RES,    /* reserved (unused) */
+    OP_XOR,    /* changed from OP_RES to bitwise XOR */
     OP_LEA,    /* load effective address */
     OP_TRAP    /* execute trap */
 };
@@ -71,7 +71,8 @@ enum
 enum
 {
     MR_KBSR = 0xFE00, /* keyboard status */
-    MR_KBDR = 0xFE02  /* keyboard data */
+    MR_KBDR = 0xFE02,  /* keyboard data */
+	R_ZERO = 0xFFFF /* Zero Register */
 };
 
 /* Memory Storage */
@@ -150,7 +151,12 @@ uint16_t check_key() {
 }
 
 void mem_write(uint16_t address, uint16_t val) {
-  memory[address] = val;
+  if(address == R_ZERO) {
+  	memory[address] = 0; /* zero register */
+  } else {
+  	memory[address] = val;  
+  }
+
 }
 
 uint16_t mem_read(uint16_t address) {
@@ -165,6 +171,9 @@ uint16_t mem_read(uint16_t address) {
       {
           memory[MR_KBSR] = 0;
       }
+  }
+  if (address == R_ZERO) {
+  	memory[R_ZERO] = 0; /* zero register */
   }
   return memory[address];
 }
@@ -203,6 +212,10 @@ int main(int argc, const char* argv[]) {
       exit(1);
     }
   }
+
+  /* Setup */
+  signal(SIGINT, handle_interrupt);
+  disable_input_buffering();
 
 
   /* set the PC to starting position */
@@ -362,6 +375,14 @@ int main(int argc, const char* argv[]) {
                 mem_write(reg[r1] + offset, reg[r0]);
               }
               break;
+		  case OP_XOR:
+			  {
+			  	uint16_t r0 = (instr >> 9) & 0x7;
+				uint16_t r1 = (instr >> 6) & 0x7;
+				reg[r0] = reg[r0]^reg[r1];
+				update_flags(r0);
+			  }
+			  break;
           case OP_TRAP:
               {
                 switch (instr & 0xFF) {
@@ -423,7 +444,6 @@ int main(int argc, const char* argv[]) {
                   }
               }
               break;
-          case OP_RES:
           case OP_RTI:
           default:
               abort();
